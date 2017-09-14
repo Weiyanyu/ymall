@@ -12,6 +12,7 @@
 
     <appender name="ymall" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <!--<File>d:/mmalllog/mmall.log</File>-->
+        <!--TODO-->
         <File>e:/Spring/ymall.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>/developer/apache-tomcat-7.0.73/logs/mmall.log.%d{yyyy-MM-dd}.gz</fileNamePattern>
@@ -26,6 +27,7 @@
 
     <appender name="error" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <!--<File>d:/mmalllog/error.log</File>-->
+        <!--TODO-->
         <File>e:/Spring/error.log</File>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>/devsoft/apache-tomcat-7.0.73/logs/error.log.%d{yyyy-MM-dd}.gz</fileNamePattern>
