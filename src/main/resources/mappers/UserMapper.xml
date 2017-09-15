@@ -155,10 +155,29 @@
   <select id="checkUserName" resultType="int" parameterType="string">
     SELECT count(1) FROM mmall_user WHERE username=#{username}
   </select>
+
+  <select id="checkUserEmail" resultType="int" parameterType="string">
+    SELECT count(1) FROM mmall_user WHERE email=#{email}
+  </select>
   
-  <select id="selectLogin" resultMap="BaseResultMap" parameterType="map" >
+  <select id="selectLogin" resultType="com.ymall.pojo.User" parameterType="map" >
     SELECT
     <include refid="Base_Column_List" />
     FROM mmall_user WHERE username=#{username} AND password=#{password}
   </select>
+  
+  <select id="selectQuestion" resultType="string" parameterType="string" >
+    SELECT question FROM mmall_user WHERE username=#{username}
+  </select>
+  
+  <select id="checkAnswer" resultType="int" parameterType="map" >
+    SELECT count(1) FROM mmall_user WHERE username=#{username} AND question=#{question}
+    AND answer=#{answer}
+  </select>
+  
+  <update id="updatePassword" parameterType="map" >
+    UPDATE mmall_user
+    SET password=#{passwordNew},update_time=now()
+    WHERE username=#{username}
+  </update>
 </mapper>
