@@ -28,6 +28,7 @@ public class UserMapperTest {
         User user1 = userMapper.selectLogin("yeonon", "asd124563");
         assertNotNull(user1);
         assertEquals(user1.getPassword(), "asd124563");
+        System.out.println(user1.getCreateTime());
     }
 
     @Test
@@ -36,6 +37,7 @@ public class UserMapperTest {
         assertEquals(1, resultCount);
         resultCount = userMapper.checkUserName("dasjdkasjkl");
         assertEquals(0, resultCount);
+
     }
 
     @Test

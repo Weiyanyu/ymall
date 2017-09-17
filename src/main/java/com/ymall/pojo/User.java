@@ -2,6 +2,8 @@ package com.ymall.pojo;
 
 import java.util.Date;
 
+
+
 public class User {
     private Integer id;
 
@@ -21,9 +23,10 @@ public class User {
 
     private Date createTime;
 
+
     private Date updateTime;
 
-    public User(Integer id, String username, String password, String email, String phone, String question, String answer, Integer role, Date createTime, Date updateTime) {
+    public User(Integer id, String username, String password, String email, String phone, String question, String answer, Integer role, Date createTime, Date upDateTime) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -33,7 +36,7 @@ public class User {
         this.answer = answer;
         this.role = role;
         this.createTime = createTime;
-        this.updateTime = updateTime;
+        this.updateTime = upDateTime;
     }
 
     public User() {

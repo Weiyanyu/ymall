@@ -144,4 +144,54 @@ public class UserServiceImpl implements IUserService{
     }
 
 
+    @Override
+    public ServerResponse<String> resetPassword(String passwordOld, String passwordNew, User user) {
+        //防止横向越权
+        int resultCount = userMapper.checkPassword(MD5Util.MD5EncodeUtf8(passwordOld), user.getId());
+        if (resultCount == 0) {
+            return ServerResponse.createByErrorMessage("旧密码错误");
+        }
+
+        user.setPassword(MD5Util.MD5EncodeUtf8(passwordNew));
+        int updateCount = userMapper.updateByPrimaryKeySelective(user);
+        if (updateCount > 0) {
+            return ServerResponse.createBySuccessMessage("密码更新成功");
+        }
+        return ServerResponse.createByErrorMessage("密码更新失败");
+    }
+
+    @Override
+    public ServerResponse<User> updateInformation(User user) {
+        //checkUserEmailById()这个方法查找的是已存在的且不是当前用户ID的邮箱
+        int resultCount = userMapper.checkUserEmailById(user.getEmail(), user.getId());
+        if (resultCount > 0) {
+            return ServerResponse.createByErrorMessage("邮箱已存在");
+        }
+
+        User updateUser = new User();
+        updateUser.setId(user.getId());
+        updateUser.setEmail(user.getEmail());
+        updateUser.setQuestion(user.getQuestion());
+        updateUser.setAnswer(user.getAnswer());
+        updateUser.setPhone(user.getPhone());
+
+        int rowCount = userMapper.updateByPrimaryKeySelective(updateUser);
+        if (rowCount <= 0) {
+            return ServerResponse.createByErrorMessage("修改个人信息失败");
+        }
+        return ServerResponse.createBySuccess("更新个人信息成功", updateUser);
+    }
+
+
+    @Override
+    public ServerResponse<User> getInformation(Integer userId) {
+        User user = userMapper.selectByPrimaryKey(userId);
+        if (user == null) {
+            return ServerResponse.createByErrorMessage("找不到当前用户");
+        }
+        user.setPassword(StringUtils.EMPTY);
+        return ServerResponse.createBySuccess(user);
+    }
+
+
 }
