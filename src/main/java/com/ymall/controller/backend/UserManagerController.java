@@ -4,7 +4,7 @@ import com.ymall.common.Const;
 import com.ymall.common.ServerResponse;
 import com.ymall.pojo.User;
 import com.ymall.service.IUserService;
-import com.ymall.service.Impl.UserServiceImpl;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpSession;
 
 @Controller
-@RequestMapping("/manager/user")
+@RequestMapping("/manage/user")
 public class UserManagerController {
 
     @Autowired
@@ -35,6 +35,12 @@ public class UserManagerController {
         }
 
         return response;
+    }
 
+    @RequestMapping(value = "logout.do", method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<User> logout(HttpSession session) {
+        session.removeAttribute(Const.CURRENT_USER);
+        return ServerResponse.createBySuccess();
     }
 }
