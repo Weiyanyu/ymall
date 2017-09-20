@@ -3,12 +3,14 @@ package com.ymall.service.Impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
+import com.ymall.common.Const;
 import com.ymall.common.ResponseCode;
 import com.ymall.common.ServerResponse;
 import com.ymall.dao.CategoryMapper;
 import com.ymall.dao.ProductMapper;
 import com.ymall.pojo.Category;
 import com.ymall.pojo.Product;
+import com.ymall.service.ICategoryService;
 import com.ymall.service.IProduceService;
 import com.ymall.util.DateTimeUtil;
 import com.ymall.util.PropertiesUtil;
@@ -28,6 +30,9 @@ public class ProduceServiceImpl implements IProduceService{
 
     @Autowired
     private CategoryMapper categoryMapper;
+
+    @Autowired
+    private ICategoryService categoryService;
 
     @Override
     public ServerResponse saveOrUpdateProduce(Product product) {
@@ -104,7 +109,7 @@ public class ProduceServiceImpl implements IProduceService{
         productDetailVO.setPrice(product.getPrice());
 
 
-        productDetailVO.setImageHost(PropertiesUtil.getProperty("ftp.server.http.prefix","http://image.ymall.com/"));
+        productDetailVO.setImageHost(PropertiesUtil.getProperty("ftp.server.http.prefix"));
 
         Category category = categoryMapper.selectByPrimaryKey(product.getCategoryId());
         if (category == null) {
@@ -163,6 +168,71 @@ public class ProduceServiceImpl implements IProduceService{
         PageInfo pageRes = new PageInfo(productList);
         pageRes.setList(productListVOList);
         return ServerResponse.createBySuccess(pageRes);
+    }
+
+
+    //以下是前端接口
+    @Override
+    public ServerResponse<ProductDetailVO> getProductDetail(Integer productId) {
+        if (productId == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+        }
+        Product product = productMapper.selectByPrimaryKey(productId);
+        if (product == null) {
+            return ServerResponse.createByErrorMessage("产品已下架或者删除");
+        }
+        if (product.getStatus() != Const.ProductStatusEnum.ON_SALE.getCode()) {
+            return ServerResponse.createByErrorMessage("产品已下架或者删除");
+        }
+        //获取数据对象，使用封装的方式来获取数据对象
+        ProductDetailVO productDetailVO =assembleProductDetailVo(product);
+        return ServerResponse.createBySuccess(productDetailVO);
+    }
+
+    @Override
+    public ServerResponse<PageInfo> getProductByKeywordCategory(String keyword, Integer categoryId, int pageNum, int pageSize, String orderBy) {
+        if (StringUtils.isBlank(keyword) && categoryId == null) {
+            return ServerResponse.createByErrorCodeMessage(ResponseCode.ILLEGAL_ARGUMENT.getCode(), ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+        }
+        List<Integer> categoryIdList = Lists.newArrayList();
+        if (categoryId != null) {
+            Category category = categoryMapper.selectByPrimaryKey(categoryId);
+            if (category == null && keyword == null) {
+                PageHelper.startPage(pageNum, pageSize);
+                List<ProductListVO> productListVOList = Lists.newArrayList();
+                PageInfo pageInfo = new PageInfo(productListVOList);
+                return ServerResponse.createBySuccess(pageInfo);
+            }
+            //这里category很有可能是一个null，所以要对空指针进行检查
+            categoryIdList = categoryService.selectCategoryAndChildrenById(category.getId()).getData();
+        }
+        if (StringUtils.isNotBlank(keyword)) {
+            keyword = new StringBuilder().append("%").append(keyword).append("%").toString();
+        }
+
+        PageHelper.startPage(pageNum, pageSize);
+        //排序
+        if (StringUtils.isNotBlank(orderBy)) {
+            if (Const.ProductOrderBy.PRICE_DESC_ASC.contains(orderBy)) {
+                String[] orderByArray = orderBy.split("_");
+                PageHelper.orderBy(orderByArray[0] + " " + orderByArray[1]);
+            }
+        }
+
+        List<Product> productList = productMapper.selectByNameAndProductIds(
+                StringUtils.isBlank(keyword)? null : keyword,
+                categoryIdList.size() == 0 ? null : categoryIdList);
+
+        List<ProductListVO> productListVOList = Lists.newArrayList();
+        for (Product product: productList) {
+            ProductListVO productListVO = assembleProductListVO(product);
+            productListVOList.add(productListVO);
+        }
+
+        PageInfo pageInfo = new PageInfo(productList);
+        pageInfo.setList(productListVOList);
+        return ServerResponse.createBySuccess(pageInfo);
+
     }
 
 

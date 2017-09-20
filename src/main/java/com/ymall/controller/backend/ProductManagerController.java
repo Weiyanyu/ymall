@@ -119,8 +119,6 @@ public class ProductManagerController {
             Map<String, String> fileMap = Maps.newHashMap();
             fileMap.put("uri",targetFileName);
             fileMap.put("url", url);
-            fileMap.put("path", path);
-            fileMap.put("targetFileName", targetFileName);
             return ServerResponse.createBySuccess(fileMap);
         }
         return ServerResponse.createByErrorMessage("无权限操作");
