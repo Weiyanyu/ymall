@@ -14,6 +14,14 @@ public class Const {
         Set<String> PRICE_DESC_ASC = Sets.newHashSet("price_desc","price_asc");
     }
 
+    public interface Cart {
+        int CHECKED = 1;    //选中状态
+        int UNCHECKED = 0;  //未选中状态
+
+        String LIMIT_NUMBER_FAIL = "LIMIT_NUMBER_FAIL";
+        String LIMIT_NUMBER_SUCCESS = "LIMIT_NUMBER_SUCCESS";
+    }
+
     public interface Role {
         int ROLE_CUSTOMER = 0;  //普通用户
         int ROLE_ADMIN = 1;   //管理员

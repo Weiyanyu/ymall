@@ -234,7 +234,4 @@ public class ProduceServiceImpl implements IProduceService{
         return ServerResponse.createBySuccess(pageInfo);
 
     }
-
-
-
 }
