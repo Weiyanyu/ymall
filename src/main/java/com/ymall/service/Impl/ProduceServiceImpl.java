@@ -203,7 +203,6 @@ public class ProduceServiceImpl implements IProduceService{
                 PageInfo pageInfo = new PageInfo(productListVOList);
                 return ServerResponse.createBySuccess(pageInfo);
             }
-            //这里category很有可能是一个null，所以要对空指针进行检查
             categoryIdList = categoryService.selectCategoryAndChildrenById(category.getId()).getData();
         }
         if (StringUtils.isNotBlank(keyword)) {

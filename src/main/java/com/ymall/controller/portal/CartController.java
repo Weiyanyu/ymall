@@ -113,7 +113,4 @@ public class CartController {
         }
         return cartService.getCartProductCount(user.getId());
     }
-
-
-
 }

@@ -24,7 +24,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.Map;
 
-//TODO 重复代码有些多，尝试重构
 @Controller
 @RequestMapping("/manage/product")
 public class ProductManagerController {
