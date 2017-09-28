@@ -50,7 +50,7 @@ public class FTPUtil {
                 ftpClient.setControlEncoding("UTF-8");
                 ftpClient.setFileType(FTPClient.BINARY_FILE_TYPE);
                 //TODO 本地被动模式，还有一个远程被动模式，区别不知
-                ftpClient.enterLocalPassiveMode();
+                ftpClient.enterLocalActiveMode();
 
                 for (File file : fileList) {
                     inputStream = new FileInputStream(file);
