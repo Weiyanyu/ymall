@@ -29,6 +29,7 @@ public class FileServiceImpl implements IFileService{
         if (!fileDir.exists()) {
             fileDir.setWritable(true);
             fileDir.mkdirs();
+            logger.info("创建upload文件夹");
         }
 
         File targetFile = new File(path, uploadFileName);
