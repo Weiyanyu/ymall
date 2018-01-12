@@ -89,7 +89,7 @@ public class UserServiceImpl implements IUserService{
     }
 
     @Override
-    public ServerResponse selectQuestion(String username) {
+    public ServerResponse<String> selectQuestion(String username) {
         ServerResponse validResponse = this.checkValid(username, Const.USERNAME);
         if (validResponse.isSuccess()) {
             return ServerResponse.createByErrorMessage("用户不存在");
