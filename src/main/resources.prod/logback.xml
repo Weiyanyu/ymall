@@ -10,6 +10,8 @@
         </filter>
     </appender>
 
+    <!--prod env-->
+
     <appender name="ymall" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <!--<File>d:/mmalllog/mmall.log</File>-->
         <!--TODO-->
