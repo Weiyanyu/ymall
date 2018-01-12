@@ -28,6 +28,7 @@ import com.ymall.vo.OrderItemVo;
 import com.ymall.vo.OrderProductVo;
 import com.ymall.vo.OrderVo;
 import com.ymall.vo.ShippingVo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -44,9 +45,9 @@ import java.util.*;
 import java.util.logging.Logger;
 
 @Service("orderService")
+@Slf4j
 public class OrderServiceImpl implements IOrderService{
 
-    private static Log log = LogFactory.getLog(OrderServiceImpl.class);
 
     @Autowired
     private OrderMapper orderMapper;
