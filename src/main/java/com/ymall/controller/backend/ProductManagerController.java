@@ -113,7 +113,7 @@ public class ProductManagerController {
         } else if (userService.checkAdminRole(user).isSuccess()) {
             String path = request.getSession().getServletContext().getRealPath("upload");
             String targetFileName = fileService.upload(file, path);
-            String url = PropertiesUtil.getProperty("ftp.server.http.prefix") + targetFileName;
+            String url = PropertiesUtil.getStringProperty("ftp.server.http.prefix") + targetFileName;
 
             Map<String, String> fileMap = Maps.newHashMap();
             fileMap.put("uri",targetFileName);
@@ -139,7 +139,7 @@ public class ProductManagerController {
                 map.put("msg", "上传失败");
                 return map;
             }
-            String url = PropertiesUtil.getProperty("ftp.server.http.prefix") + targetFileName;
+            String url = PropertiesUtil.getStringProperty("ftp.server.http.prefix") + targetFileName;
 
             map.put("success", true);
             map.put("msg", "富文本上传成功");
