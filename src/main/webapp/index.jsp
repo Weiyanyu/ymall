@@ -1,6 +1,10 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <title>Spring文件上传</title>
+
+
+<h1>Tomcat1</h1>
+
 <body>
 <form name="upload" action="/manage/product/upload.do" enctype="multipart/form-data" method="post">
     <input type="file" name="upload_file"/>

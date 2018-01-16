@@ -13,7 +13,6 @@ import org.codehaus.jackson.type.TypeReference;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.List;
 
 @Slf4j
 public class JsonUtil {
@@ -29,7 +28,7 @@ public class JsonUtil {
         //忽略空Bean错误(空Bean不报异常)
         objectMapper.configure(SerializationConfig.Feature.FAIL_ON_EMPTY_BEANS, false);
 
-        //统一时间格式
+        //统一时间格式 yyyy-MM-dd HH:mm:ss
         objectMapper.setDateFormat(new SimpleDateFormat(DateTimeUtil.STANDER_FORMAT));
 
         //忽略在json中存在而在java中找不到对应字段的的错误
@@ -110,21 +109,27 @@ public class JsonUtil {
 
 
     public static void main(String[] args) {
-        User user1 = new User();
-        user1.setId(1);
-        user1.setUsername("yeonon");
 
-        User user2 = new User();
-        user2.setId(2);
-        user2.setUsername("weiyanyu");
 
-        List<User> userList = Lists.newArrayList();
-        userList.add(user1);
-        userList.add(user2);
+//        User user1 = new User();
+//        String json = JsonUtil.objToString(user1);
+//        System.out.println(json);
 
-        String resultString = JsonUtil.objToString(userList);
-
-        List<User> userList1 = JsonUtil.stringToObject(resultString, List.class, User.class);
+//        User user1 = new User();
+//        user1.setId(1);
+//        user1.setUsername("yeonon");
+//
+//        User user2 = new User();
+//        user2.setId(2);
+//        user2.setUsername("weiyanyu");
+//
+//        List<User> userList = Lists.newArrayList();
+//        userList.add(user1);
+//        userList.add(user2);
+//
+//        String resultString = JsonUtil.objToString(userList);
+//
+//        List<User> userList1 = JsonUtil.stringToObject(resultString, List.class, User.class);
 
     }
 

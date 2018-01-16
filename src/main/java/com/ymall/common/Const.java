@@ -14,6 +14,10 @@ public class Const {
         Set<String> PRICE_DESC_ASC = Sets.newHashSet("price_desc", "price_asc");
     }
 
+    public interface RedisCacheExTime {
+        int exTime = 60 * 30;
+    }
+
     public interface Cart {
         int CHECKED = 1;    //选中状态
         int UNCHECKED = 0;  //未选中状态
