@@ -5,7 +5,7 @@ import com.ymall.dao.UserMapper;
 import com.ymall.pojo.User;
 import com.ymall.service.IUserService;
 import com.ymall.util.MD5Util;
-import com.ymall.util.RedisPoolUtil;
+import com.ymall.util.RedisShardedPoolUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -108,7 +108,7 @@ public class UserServiceImpl implements IUserService{
 
         String forgetToken = UUID.randomUUID().toString();
 //        //使用redis作为缓存
-        RedisPoolUtil.setex(Const.TOKEN_CACHE_PREFX + username, forgetToken, 60*30*12);
+        RedisShardedPoolUtil.setex(Const.TOKEN_CACHE_PREFX + username, forgetToken, 60*30*12);
 
         return ServerResponse.createBySuccess(forgetToken);
     }
@@ -125,7 +125,7 @@ public class UserServiceImpl implements IUserService{
             return ServerResponse.createByErrorMessage("用户不存在");
         }
 
-        String token = RedisPoolUtil.get(Const.TOKEN_CACHE_PREFX + username);
+        String token = RedisShardedPoolUtil.get(Const.TOKEN_CACHE_PREFX + username);
         if (StringUtils.isBlank(token)) {
             return ServerResponse.createByErrorMessage("token无效，或者过期");
         }
@@ -134,7 +134,7 @@ public class UserServiceImpl implements IUserService{
             String md5Password = MD5Util.MD5EncodeUtf8(passwordNew);
             int rowCount = userMapper.updatePassword(username, md5Password);
             if (rowCount > 0) {
-                RedisPoolUtil.del(Const.TOKEN_CACHE_PREFX + username);
+                RedisShardedPoolUtil.del(Const.TOKEN_CACHE_PREFX + username);
                 return ServerResponse.createBySuccessMessage("修改密码成功");
             }
         } else {

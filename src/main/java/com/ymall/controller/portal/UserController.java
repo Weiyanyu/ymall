@@ -1,24 +1,20 @@
 package com.ymall.controller.portal;
 
 import com.ymall.common.Const;
-import com.ymall.common.RedisPool;
 import com.ymall.common.ResponseCode;
 import com.ymall.common.ServerResponse;
-import com.ymall.dao.UserMapper;
 import com.ymall.pojo.User;
 import com.ymall.service.IUserService;
 import com.ymall.util.CookieUtil;
 import com.ymall.util.JsonUtil;
-import com.ymall.util.RedisPoolUtil;
+import com.ymall.util.RedisShardedPoolUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -38,7 +34,7 @@ public class UserController {
         if (response.isSuccess()) {
 
             CookieUtil.writeCookie(httpServletResponse,session.getId());
-            RedisPoolUtil.setex(session.getId(),
+            RedisShardedPoolUtil.setex(session.getId(),
                     JsonUtil.objToPrettyString(response.getData()),
                     Const.RedisCacheExTime.exTime);
         }
@@ -51,7 +47,7 @@ public class UserController {
     public ServerResponse<User> logout(HttpServletRequest request, HttpServletResponse response) {
         String loginToken = CookieUtil.readCookie(request);
         CookieUtil.delCookie(request, response);
-        RedisPoolUtil.del(loginToken);
+        RedisShardedPoolUtil.del(loginToken);
         return ServerResponse.createBySuccess();
     }
 
@@ -81,7 +77,7 @@ public class UserController {
             return ServerResponse.createByErrorMessage("用户未登录");
         }
 
-        String userJsonStr = RedisPoolUtil.get(loginToken);
+        String userJsonStr = RedisShardedPoolUtil.get(loginToken);
         User user = JsonUtil.stringToObject(userJsonStr, User.class);
 
         if (user == null) {
@@ -117,7 +113,7 @@ public class UserController {
             return ServerResponse.createByErrorMessage("用户未登录");
         }
 
-        String userLoginJson = RedisPoolUtil.get(loginToken);
+        String userLoginJson = RedisShardedPoolUtil.get(loginToken);
         User user = JsonUtil.stringToObject(userLoginJson, User.class);
         if (user == null) {
             return ServerResponse.createByErrorMessage("用户未登录");
@@ -133,7 +129,7 @@ public class UserController {
             return ServerResponse.createByErrorMessage("用户未登录");
         }
 
-        String userLoginJson = RedisPoolUtil.get(loginToken);
+        String userLoginJson = RedisShardedPoolUtil.get(loginToken);
         User currentUser = JsonUtil.stringToObject(userLoginJson, User.class);
 
         if (currentUser == null) {
@@ -146,7 +142,7 @@ public class UserController {
         ServerResponse<User> response = userService.updateInformation(user);
         if (response.isSuccess()) {
             response.getData().setUsername(currentUser.getUsername());
-            RedisPoolUtil.setex(loginToken,
+            RedisShardedPoolUtil.setex(loginToken,
                     JsonUtil.objToPrettyString(response.getData()),
                     Const.RedisCacheExTime.exTime);
         }
