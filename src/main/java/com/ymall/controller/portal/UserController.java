@@ -12,6 +12,7 @@ import com.ymall.util.JsonUtil;
 import com.ymall.util.RedisPoolUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -36,11 +37,10 @@ public class UserController {
         ServerResponse<User> response = userService.login(username, password);
         if (response.isSuccess()) {
 
+            CookieUtil.writeCookie(httpServletResponse,session.getId());
             RedisPoolUtil.setex(session.getId(),
                     JsonUtil.objToPrettyString(response.getData()),
                     Const.RedisCacheExTime.exTime);
-            CookieUtil.writeCookie(httpServletResponse,session.getId());
-//            session.setAttribute(Const.CURRENT_USER, response.getData());
         }
         return response;
     }
@@ -48,8 +48,10 @@ public class UserController {
 
     @RequestMapping(value = "logout.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<User> logout(HttpSession session) {
-        session.removeAttribute(Const.CURRENT_USER);
+    public ServerResponse<User> logout(HttpServletRequest request, HttpServletResponse response) {
+        String loginToken = CookieUtil.readCookie(request);
+        CookieUtil.delCookie(request, response);
+        RedisPoolUtil.del(loginToken);
         return ServerResponse.createBySuccess();
     }
 
@@ -108,8 +110,15 @@ public class UserController {
 
     @RequestMapping(value = "reset_password.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<String> resetPassword(HttpSession session, String passwordOld, String passwordNew) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse<String> resetPassword(HttpServletRequest request, String passwordOld, String passwordNew) {
+
+        String loginToken = CookieUtil.readCookie(request);
+        if (StringUtils.isEmpty(loginToken)) {
+            return ServerResponse.createByErrorMessage("用户未登录");
+        }
+
+        String userLoginJson = RedisPoolUtil.get(loginToken);
+        User user = JsonUtil.stringToObject(userLoginJson, User.class);
         if (user == null) {
             return ServerResponse.createByErrorMessage("用户未登录");
         }
@@ -118,8 +127,15 @@ public class UserController {
 
     @RequestMapping(value = "update_information.do", method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<User> updateInformation(HttpSession session, User user) {
-        User currentUser = (User) session.getAttribute(Const.CURRENT_USER);
+    public ServerResponse<User> updateInformation(HttpServletRequest request, User user) {
+        String loginToken = CookieUtil.readCookie(request);
+        if (StringUtils.isEmpty(loginToken)) {
+            return ServerResponse.createByErrorMessage("用户未登录");
+        }
+
+        String userLoginJson = RedisPoolUtil.get(loginToken);
+        User currentUser = JsonUtil.stringToObject(userLoginJson, User.class);
+
         if (currentUser == null) {
             return ServerResponse.createByErrorMessage("用户未登录");
         }
@@ -130,7 +146,9 @@ public class UserController {
         ServerResponse<User> response = userService.updateInformation(user);
         if (response.isSuccess()) {
             response.getData().setUsername(currentUser.getUsername());
-            session.setAttribute(Const.CURRENT_USER, response.getData());
+            RedisPoolUtil.setex(loginToken,
+                    JsonUtil.objToPrettyString(response.getData()),
+                    Const.RedisCacheExTime.exTime);
         }
         return response;
     }

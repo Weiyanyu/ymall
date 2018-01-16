@@ -1,13 +1,11 @@
 package com.ymall.service.Impl;
 
-import com.ymall.common.Const;
-import com.ymall.common.ResponseCode;
-import com.ymall.common.ServerResponse;
-import com.ymall.common.TokenCache;
+import com.ymall.common.*;
 import com.ymall.dao.UserMapper;
 import com.ymall.pojo.User;
 import com.ymall.service.IUserService;
 import com.ymall.util.MD5Util;
+import com.ymall.util.RedisPoolUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -109,7 +107,9 @@ public class UserServiceImpl implements IUserService{
         }
 
         String forgetToken = UUID.randomUUID().toString();
-        TokenCache.setKey(TokenCache.PREFIX + username, forgetToken);
+//        //使用redis作为缓存
+        RedisPoolUtil.setex(Const.TOKEN_CACHE_PREFX + username, forgetToken, 60*30*12);
+
         return ServerResponse.createBySuccess(forgetToken);
     }
 
@@ -125,8 +125,7 @@ public class UserServiceImpl implements IUserService{
             return ServerResponse.createByErrorMessage("用户不存在");
         }
 
-        String token = TokenCache.getValue(TokenCache.PREFIX + username);
-
+        String token = RedisPoolUtil.get(Const.TOKEN_CACHE_PREFX + username);
         if (StringUtils.isBlank(token)) {
             return ServerResponse.createByErrorMessage("token无效，或者过期");
         }

@@ -10,6 +10,8 @@ public class Const {
     public static final String EMAIL = "email";
     public static final String USERNAME = "username";
 
+    public static final String TOKEN_CACHE_PREFX="token_";
+
     public interface ProductOrderBy {
         Set<String> PRICE_DESC_ASC = Sets.newHashSet("price_desc", "price_asc");
     }
