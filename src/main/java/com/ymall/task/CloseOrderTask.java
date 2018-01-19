@@ -38,7 +38,7 @@ public class CloseOrderTask {
         long lockTimeOut = Long.parseLong(PropertiesUtil.getStringProperty("lock.timeout","5000"));
         Long result = RedisShardedPoolUtil.setnx(Const.RedisLock.REDIS_CLOSE_ORDER_LOCK, String.valueOf(System.currentTimeMillis() + lockTimeOut));
         if (result != null && result.intValue() == 1) {
-            closeOrder();
+            closeOrder(Const.RedisLock.REDIS_CLOSE_ORDER_LOCK);
         } else {
             log.info("获取锁失败{}", Thread.currentThread().getName());
         }
@@ -49,17 +49,17 @@ public class CloseOrderTask {
     @Scheduled(cron = "0 */1 * * * ?")
     public void closeOrderTaskV3() {
         log.info("定时任务开启");
-        long lockTimeOut = Long.parseLong(PropertiesUtil.getStringProperty("lock.timeout","5000"));
+        Long lockTimeOut = Long.parseLong(PropertiesUtil.getStringProperty("lock.timeout","5000"));
         Long result = RedisShardedPoolUtil.setnx(Const.RedisLock.REDIS_CLOSE_ORDER_LOCK, String.valueOf(System.currentTimeMillis() + lockTimeOut));
         if (result != null && result.intValue() == 1) {
             log.info("获取锁成功{}",Thread.currentThread().getName());
-            closeOrder();
+            closeOrder(Const.RedisLock.REDIS_CLOSE_ORDER_LOCK);
         } else {
             String lockValueStr = RedisShardedPoolUtil.get(Const.RedisLock.REDIS_CLOSE_ORDER_LOCK);
-            if (lockValueStr == null || System.currentTimeMillis() > Long.parseLong(lockValueStr)) {
+            if (lockValueStr != null && System.currentTimeMillis() > Long.parseLong(lockValueStr)) {
                 String getSetResult = RedisShardedPoolUtil.getSet(Const.RedisLock.REDIS_CLOSE_ORDER_LOCK, String.valueOf(System.currentTimeMillis() + lockTimeOut));
                 if (getSetResult == null || StringUtils.equals(lockValueStr, getSetResult)) {
-                    closeOrder();
+                    closeOrder(Const.RedisLock.REDIS_CLOSE_ORDER_LOCK);
                 } else {
                     log.info("获取锁失败{}", Thread.currentThread().getName());
                 }
@@ -72,9 +72,10 @@ public class CloseOrderTask {
         log.info("定时任务结束");
     }
 
-    private void closeOrder() {
+
+    private void closeOrder(String lockName) {
         log.info("获得分布式锁{}", Thread.currentThread().getName());
-        RedisShardedPoolUtil.expire(Const.RedisLock.REDIS_CLOSE_ORDER_LOCK, 5);
+        RedisShardedPoolUtil.expire(lockName, 5);
         int hour = PropertiesUtil.getIntegerProperty("close.order.task.time.hour",2);
         log.info("执行任务");
         RedisShardedPoolUtil.del(Const.RedisLock.REDIS_CLOSE_ORDER_LOCK);
