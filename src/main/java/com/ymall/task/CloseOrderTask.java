@@ -46,7 +46,7 @@ public class CloseOrderTask {
         log.info("定时任务结束");
     }
 
-    @Scheduled(cron = "0 */1 * * * ?")
+//    @Scheduled(cron = "0 */1 * * * ?")
     public void closeOrderTaskV3() {
         log.info("定时任务开启");
         Long lockTimeOut = Long.parseLong(PropertiesUtil.getStringProperty("lock.timeout","5000"));
@@ -70,6 +70,35 @@ public class CloseOrderTask {
         }
 
         log.info("定时任务结束");
+    }
+
+    @Scheduled(cron="0 */1 * * * ?")
+    public void closeOrderTaskV4() {
+        log.info("关闭订单定时任务启动");
+        long lockTimeout = Long.parseLong(PropertiesUtil.getStringProperty("lock.timeout", "5000"));
+        Long setnxResult = RedisShardedPoolUtil.setnx(Const.RedisLock.REDIS_CLOSE_ORDER_LOCK, String.valueOf(System.currentTimeMillis() + lockTimeout));
+        if (setnxResult != null && setnxResult.intValue() == 1) {
+            closeOrder(Const.RedisLock.REDIS_CLOSE_ORDER_LOCK);
+        } else {
+            //未获取到锁，继续判断，判断时间戳，看是否可以重置并获取到锁
+            String lockValueStr = RedisShardedPoolUtil.get(Const.RedisLock.REDIS_CLOSE_ORDER_LOCK);
+            if (lockValueStr != null && System.currentTimeMillis() > Long.parseLong(lockValueStr)) {
+                String getSetResult = RedisShardedPoolUtil.getSet(Const.RedisLock.REDIS_CLOSE_ORDER_LOCK, String.valueOf(System.currentTimeMillis() + lockTimeout));
+                //再次用当前时间戳getset。
+                //返回给定的key的旧值，->旧值判断，是否可以获取锁
+                //当key没有旧值时，即key不存在时，返回nil ->获取锁
+                //这里我们set了一个新的value值，获取旧的值。
+                if (getSetResult == null || (getSetResult != null && StringUtils.equals(lockValueStr, getSetResult))) {
+                    //真正获取到锁
+                    closeOrder(Const.RedisLock.REDIS_CLOSE_ORDER_LOCK);
+                } else {
+                    log.info("没有获取到分布式锁:{}", Const.RedisLock.REDIS_CLOSE_ORDER_LOCK);
+                }
+            } else {
+                log.info("没有获取到分布式锁:{}", Const.RedisLock.REDIS_CLOSE_ORDER_LOCK);
+            }
+        }
+        log.info("关闭订单定时任务结束");
     }
 
 
