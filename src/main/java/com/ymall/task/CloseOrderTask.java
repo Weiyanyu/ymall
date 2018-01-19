@@ -87,7 +87,10 @@ public class CloseOrderTask {
             if (getLock = rLock.tryLock(0, 50, TimeUnit.SECONDS)) {
                 log.info("获得分布式锁");
                 int hour = PropertiesUtil.getIntegerProperty("close.order.task.time.hour",2);
-                //
+                //这里放一下循环测试一下，CPU太快了，导致同时两个进程，甚至多个进程获得锁
+                for (long i = 0; i < 1000000; i++) {
+                    for (int j = 1; j < 1000; j++);
+                }
             } else {
                 log.info("没有获得分布式锁");
             }
