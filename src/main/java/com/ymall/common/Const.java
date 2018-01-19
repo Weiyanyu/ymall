@@ -143,5 +143,9 @@ public class Const {
 
     }
 
+    public interface RedisLock{
+        String REDIS_CLOSE_ORDER_LOCK = "REDIS_CLOSE_ORDER_LOCK";
+    }
+
 
 }
