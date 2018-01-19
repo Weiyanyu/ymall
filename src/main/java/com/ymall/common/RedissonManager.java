@@ -4,10 +4,12 @@ import com.ymall.util.PropertiesUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.Redisson;
 import org.redisson.config.Config;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 
 @Slf4j
+@Component
 public class RedissonManager {
     private Config config = new Config();
 
