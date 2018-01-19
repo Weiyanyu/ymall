@@ -54,6 +54,19 @@ public class RedisShardedPoolUtil {
         return result;
     }
 
+    public static String getSet(String key, String value) {
+        ShardedJedis jedis;
+        String result;
+
+        try {
+            jedis = RedisShardedPool.getJedis();
+            result = jedis.getSet(key, value);
+        } catch (Exception e) {
+            log.error("getset key {}, value {} error ", key, value, e);
+            return null;
+        }
+        return result;
+    }
 
     public static Long setnx(String key, String value) {
         ShardedJedis jedis;
@@ -63,7 +76,7 @@ public class RedisShardedPoolUtil {
             jedis = RedisShardedPool.getJedis();
             result = jedis.setnx(key, value);
         } catch (Exception e) {
-            log.error("set key {}, value {} error ", key, value, e);
+            log.error("setnx key {}, value {} error ", key, value, e);
             return null;
         }
         return result;
