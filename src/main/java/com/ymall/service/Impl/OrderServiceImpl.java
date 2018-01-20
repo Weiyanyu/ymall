@@ -28,8 +28,10 @@ import com.ymall.vo.OrderItemVo;
 import com.ymall.vo.OrderProductVo;
 import com.ymall.vo.OrderVo;
 import com.ymall.vo.ShippingVo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ibatis.annotations.Param;
@@ -44,9 +46,9 @@ import java.util.*;
 import java.util.logging.Logger;
 
 @Service("orderService")
+@Slf4j
 public class OrderServiceImpl implements IOrderService{
 
-    private static Log log = LogFactory.getLog(OrderServiceImpl.class);
 
     @Autowired
     private OrderMapper orderMapper;
@@ -132,7 +134,7 @@ public class OrderServiceImpl implements IOrderService{
         orderVo.setCloseTime(DateTimeUtil.dateToStr(order.getCloseTime()));
         orderVo.setCreateTime(DateTimeUtil.dateToStr(order.getCreateTime()));
 
-        orderVo.setImageHost(PropertiesUtil.getProperty("ftp.server.http.prefix"));
+        orderVo.setImageHost(PropertiesUtil.getStringProperty("ftp.server.http.prefix"));
 
         List<OrderItemVo> orderItemVoList = Lists.newArrayList();
 
@@ -286,7 +288,7 @@ public class OrderServiceImpl implements IOrderService{
         }
         orderProductVo.setOrderItemVoList(orderItemVoList);
         orderProductVo.setTotalPrice(payment);
-        orderProductVo.setImageHost(PropertiesUtil.getProperty("ftp.server.http.prefix"));
+        orderProductVo.setImageHost(PropertiesUtil.getStringProperty("ftp.server.http.prefix"));
         return ServerResponse.createBySuccess(orderProductVo);
 
     }
@@ -397,7 +399,7 @@ public class OrderServiceImpl implements IOrderService{
                 .setUndiscountableAmount(undiscountableAmount).setSellerId(sellerId).setBody(body)
                 .setOperatorId(operatorId).setStoreId(storeId).setExtendParams(extendParams)
                 .setTimeoutExpress(timeoutExpress)
-                .setNotifyUrl(PropertiesUtil.getProperty("alipay.callback.url"))//支付宝服务器主动通知商户服务器里指定的页面http路径,根据需要设置
+                .setNotifyUrl(PropertiesUtil.getStringProperty("alipay.callback.url"))//支付宝服务器主动通知商户服务器里指定的页面http路径,根据需要设置
                 .setGoodsDetailList(goodsDetailList);
 
         /** 一定要在创建AlipayTradeService之前调用Configs.init()设置默认参数
@@ -439,7 +441,7 @@ public class OrderServiceImpl implements IOrderService{
                 }
 
                 log.info("qrPath:" + qrPath);
-                String qrUrl = PropertiesUtil.getProperty("ftp.server.http.prefix") + targetFile.getName();
+                String qrUrl = PropertiesUtil.getStringProperty("ftp.server.http.prefix") + targetFile.getName();
                 resultMap.put("qrUrl", qrUrl);
                 return ServerResponse.createBySuccess(resultMap);
             case FAILED:
@@ -569,5 +571,30 @@ public class OrderServiceImpl implements IOrderService{
             }
         }
         return ServerResponse.createByErrorMessage("订单不存在");
+    }
+
+    @Override
+    public void closeOrder(int hour) {
+        Date closeDateTime = DateUtils.addHours(new Date(), -hour);
+        List<Order> orderList = orderMapper.
+                selectOrderStatusByCreateTime(Const.OrderStatusEnum.NO_PAY.getCode(),DateTimeUtil.dateToStr(closeDateTime));
+
+        for (Order order : orderList) {
+            List<OrderItem> orderItemList = orderItemMapper.selectByOrderNo(order.getOrderNo());
+            for (OrderItem orderItem : orderItemList) {
+                Integer stock = productMapper.selectStockByProductId(orderItem.getProductId());
+
+                if (stock == null) {
+                    continue;
+                }
+
+                Product product = new Product();
+                product.setId(orderItem.getProductId());
+                product.setStock(stock + orderItem.getQuantity());
+                productMapper.updateByPrimaryKeySelective(product);
+            }
+            orderMapper.closeOrderByOrderId(order.getId());
+            log.info("关闭订单，该订单号为: {}", order.getOrderNo());
+        }
     }
 }

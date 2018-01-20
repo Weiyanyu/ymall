@@ -109,7 +109,7 @@ public class ProduceServiceImpl implements IProduceService{
         productDetailVO.setPrice(product.getPrice());
 
 
-        productDetailVO.setImageHost(PropertiesUtil.getProperty("ftp.server.http.prefix"));
+        productDetailVO.setImageHost(PropertiesUtil.getStringProperty("ftp.server.http.prefix"));
 
         Category category = categoryMapper.selectByPrimaryKey(product.getCategoryId());
         if (category == null) {
@@ -149,7 +149,7 @@ public class ProduceServiceImpl implements IProduceService{
         productListVO.setSubtitle(product.getSubtitle());
         productListVO.setPrice(product.getPrice());
         productListVO.setStatus(product.getStatus());
-        productListVO.setImageHost(PropertiesUtil.getProperty("ftp.server.http.prefix","http://image.ymall.com/"));
+        productListVO.setImageHost(PropertiesUtil.getStringProperty("ftp.server.http.prefix","http://image.ymall.com/"));
         return productListVO;
     }
 

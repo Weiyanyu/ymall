@@ -1,7 +1,27 @@
 package com.ymall.pojo;
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import java.util.Date;
 
+
+/**
+ * 这里getter,setter AllArgsConstructor, NoArgsConstructor 都是lombok框架提供的注解，旨在简化代码
+ * setter (添加字段setter方法)
+ * getter (添加字段getter方法)
+ * AllArgsConstructor (添加所有字段的全参构造器)
+ * NoArgsConstructor  (添加无参构造器)
+ *
+ * pojo 包里的基本都是这样,有些还有EqualAndHashCode是生成equal 和 hashcode方法
+ * (可以指定特定字段或者排除特定字段参与，默认全字段参与)
+ */
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Cart {
     private Integer id;
 
@@ -17,73 +37,6 @@ public class Cart {
 
     private Date updateTime;
 
-    public Cart(Integer id, Integer userId, Integer productId, Integer quantity, Integer checked, Date createTime, Date updateTime) {
-        this.id = id;
-        this.userId = userId;
-        this.productId = productId;
-        this.quantity = quantity;
-        this.checked = checked;
-        this.createTime = createTime;
-        this.updateTime = updateTime;
-    }
 
-    public Cart() {
-        super();
-    }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public Integer getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Integer userId) {
-        this.userId = userId;
-    }
-
-    public Integer getProductId() {
-        return productId;
-    }
-
-    public void setProductId(Integer productId) {
-        this.productId = productId;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
-    public Integer getChecked() {
-        return checked;
-    }
-
-    public void setChecked(Integer checked) {
-        this.checked = checked;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
-    }
 }

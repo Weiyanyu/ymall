@@ -10,8 +10,14 @@ public class Const {
     public static final String EMAIL = "email";
     public static final String USERNAME = "username";
 
+    public static final String TOKEN_CACHE_PREFX="token_";
+
     public interface ProductOrderBy {
         Set<String> PRICE_DESC_ASC = Sets.newHashSet("price_desc", "price_asc");
+    }
+
+    public interface RedisCacheExTime {
+        int exTime = 60 * 30;
     }
 
     public interface Cart {
@@ -135,6 +141,10 @@ public class Const {
             throw new RuntimeException("没有找到对应的枚举");
         }
 
+    }
+
+    public interface RedisLock{
+        String REDIS_CLOSE_ORDER_LOCK = "REDIS_CLOSE_ORDER_LOCK";
     }
 
 

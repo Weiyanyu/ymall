@@ -26,15 +26,15 @@
   <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
     select 
     <include refid="Base_Column_List" />
-    from mmall_order
+    from ymall_order
     where id = #{id,jdbcType=INTEGER}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
-    delete from mmall_order
+    delete from ymall_order
     where id = #{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.ymall.pojo.Order" >
-    insert into mmall_order (id, order_no, user_id, 
+    insert into ymall_order (id, order_no, user_id, 
       shipping_id, payment, payment_type, 
       postage, status, payment_time, 
       send_time, end_time, close_time, 
@@ -46,7 +46,7 @@
       now(), now())
   </insert>
   <insert id="insertSelective" parameterType="com.ymall.pojo.Order" >
-    insert into mmall_order
+    insert into ymall_order
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="id != null" >
         id,
@@ -137,7 +137,7 @@
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.ymall.pojo.Order" >
-    update mmall_order
+    update ymall_order
     <set >
       <if test="orderNo != null" >
         order_no = #{orderNo,jdbcType=BIGINT},
@@ -182,7 +182,7 @@
     where id = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ymall.pojo.Order" >
-    update mmall_order
+    update ymall_order
     set order_no = #{orderNo,jdbcType=BIGINT},
       user_id = #{userId,jdbcType=INTEGER},
       shipping_id = #{shippingId,jdbcType=INTEGER},
@@ -202,7 +202,7 @@
   <select id="selectOrderByUserIdAndOrderId" resultMap="BaseResultMap" parameterType="map" >
     SELECT
     <include refid="Base_Column_List" />
-    FROM mmall_order
+    FROM ymall_order
     WHERE user_id = #{userId}
     AND order_no = #{orderNo}
   </select>
@@ -210,14 +210,14 @@
   <select id="selectOrderByOrderNo" resultMap="BaseResultMap" parameterType="long" >
     SELECT
     <include refid="Base_Column_List" />
-    FROM mmall_order
+    FROM ymall_order
     WHERE order_no = #{orderNo}
   </select>
 
   <select id="selectOrdersByUserId" parameterType="int" resultMap="BaseResultMap" >
     SELECT
     <include refid="Base_Column_List" />
-    FROM mmall_order
+    FROM ymall_order
     WHERE user_id = #{userId}
     ORDER BY create_time DESC
   </select>
@@ -225,7 +225,25 @@
   <select id="selectAll" resultMap="BaseResultMap" >
     SELECT
     <include refid="Base_Column_List" />
-    FROM mmall_order
+    FROM ymall_order
     ORDER BY create_time DESC
   </select>
+
+  <select id="selectOrderStatusByCreateTime" resultMap="BaseResultMap" parameterType="map" >
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM ymall_order
+    WHERE status=#{status}
+    <![CDATA[
+    AND create_time <= #{createTime}
+    ]]>
+    ORDER BY create_time DESC
+  </select>
+
+
+  <update id="closeOrderByOrderId" parameterType="int">
+    UPDATE ymall_order
+    SET status = 0
+    WHERE id=#{orderId}
+  </update>
 </mapper>

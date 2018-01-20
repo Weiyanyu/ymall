@@ -2,7 +2,6 @@ package com.ymall.service;
 
 import com.ymall.common.Const;
 import com.ymall.common.ServerResponse;
-import com.ymall.common.TokenCache;
 import com.ymall.pojo.User;
 import com.ymall.util.MD5Util;
 import org.junit.Test;
@@ -93,24 +92,7 @@ public class UserServiceTest {
 
     }
 
-    @Test
-    public void testCheckAnswer() {
-        ServerResponse response = userService.checkAnswer("yeonon", "你是谁", "韦燕宇");
-        String token = TokenCache.getValue(TokenCache.PREFIX + "yeonon");
-        assertEquals(response.getData(), token);
-        response = userService.checkAnswer("yeonon", "你是谁", "abc");
-        assertEquals(response.getMsg(), "答案错误");
-    }
 
-    @Test
-    public void testForgetPassword() {
-        ServerResponse response = userService.checkAnswer("yeonon", "你是谁", "韦燕宇");
-        String token = TokenCache.getValue(TokenCache.PREFIX + "yeonon");
-        response = userService.forgetResetPassword("yeonon", "a124563", token);
-        assertEquals(response.getMsg(), "修改密码成功");
-
-        //TODO forgetPassword()方法下的其他情况以后再测试，理论上没问题
-    }
 
 
 }

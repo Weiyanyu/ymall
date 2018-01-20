@@ -33,16 +33,8 @@ public class OrderManagerController {
     public ServerResponse<PageInfo> orderList(HttpSession session,
                                               @RequestParam(value = "pageNum" , defaultValue = "1") int pageNum,
                                               @RequestParam(value = "pageSize" , defaultValue = "10") int pageSize) {
-        User user = (User) session.getAttribute(Const.CURRENT_USER);
-        if (user == null) {
-            return ServerResponse.createByErrorCodeMessage(ResponseCode.NEED_LOGIN.getCode(),"用户未登录，请登录管理员");
-        }
-        if (userService.checkAdminRole(user).isSuccess()) {
-            //成功就说明是管理员的身份
-            //直接返回service里的逻辑
-            return orderService.manageList(pageNum, pageSize);
-        }
-        return ServerResponse.createByErrorMessage("无权限操作");
+
+        return orderService.manageList(pageNum, pageSize);
     }
 
     @RequestMapping("detail.do")
