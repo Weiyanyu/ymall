@@ -3,7 +3,7 @@
 <title>Spring文件上传</title>
 
 
-<h1>Tomcat2</h1>
+<h1>Tomcat1</h1>
 
 <body>
 <form name="upload" action="/manage/product/upload.do" enctype="multipart/form-data" method="post">

@@ -1,14 +1,12 @@
 package com.ymall.task;
 
 import com.ymall.common.Const;
-import com.ymall.common.RedisShardedPool;
 import com.ymall.common.RedissonManager;
 import com.ymall.service.IOrderService;
 import com.ymall.util.PropertiesUtil;
 import com.ymall.util.RedisShardedPoolUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.redisson.Redisson;
 import org.redisson.api.RLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
